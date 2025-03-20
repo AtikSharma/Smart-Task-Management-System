@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.taskmanager</groupId>
-	<artifactId>usermanagement</artifactId>
+	<artifactId>user-svc</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>user-svc</name>
+	<name>User Management</name>
 	<description>Service to manage users and role</description>
 	<url/>
 	<licenses>
