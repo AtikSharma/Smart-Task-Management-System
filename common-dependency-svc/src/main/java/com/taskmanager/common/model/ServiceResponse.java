@@ -12,23 +12,21 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ServiceResponse {
+public class ServiceResponse extends BaseResponse {
 
 	private String title;
-	private HttpStatus status;
-	private String correlationId;
 
 	public ResponseEntity<Object> build(String title, HttpStatus status) {
-		this.status = status;
-		this.title = title;
-		this.correlationId = RequestContext.getCorrelationId();
+		setStatus(status.value());
+		setTitle(title);
+		setCorrelationId(RequestContext.getCorrelationId());
 		return new ResponseEntity<Object>(this, status);
 	}
 
 	public <T> ResponseEntity<T> build(String title, HttpStatus status, T responseBody) {
-		this.title = title;
-		this.status = status;
-		this.correlationId = RequestContext.getCorrelationId();
+		setStatus(status.value());
+		setTitle(title);
+		setCorrelationId(RequestContext.getCorrelationId());
 		return new ResponseEntity<>(responseBody, status);
 	}
 

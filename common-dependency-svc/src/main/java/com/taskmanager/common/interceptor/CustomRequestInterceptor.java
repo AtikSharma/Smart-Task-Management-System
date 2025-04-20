@@ -1,6 +1,7 @@
 package com.taskmanager.common.interceptor;
 
-import java.util.UUID;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,23 +18,33 @@ public class CustomRequestInterceptor implements HandlerInterceptor {
 
 	private static final Logger logger = LoggerFactory.getLogger(CustomRequestInterceptor.class);
 
+	private LocalDateTime preHandleTimeStamp;
+	private LocalDateTime postHandleTimeStamp;
+	private LocalDateTime completionTimeStamp;
+
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		logger.debug("Request URI: " + request.getRequestURI());
-		RequestContext.setCorrelationId(UUID.randomUUID().toString());
-		return true; // Continue processing the request
+		preHandleTimeStamp = LocalDateTime.now();
+		logger.debug("Request URI: " + request.getRequestURI() + " at : " + preHandleTimeStamp);
+		RequestContext.resolveCorrelationId(request);
+		RequestContext.resolveAuthorizationToken(request);
+		return true;
 	}
 
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			org.springframework.web.servlet.ModelAndView modelAndView) throws Exception {
-		logger.debug("PostHandle: Processing request completed.");
+		postHandleTimeStamp = LocalDateTime.now();
+		logger.debug("PostHandle: Processing request completed in : "
+				+ Duration.between(preHandleTimeStamp, postHandleTimeStamp).toMillis() + " milliseconds");
 	}
 
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
-		logger.debug("AfterCompletion: Request processing completed.");
+		completionTimeStamp = LocalDateTime.now();
+		logger.debug("AfterCompletion: Request processing completed in : "
+				+ Duration.between(preHandleTimeStamp, completionTimeStamp).toMillis() + " milliseconds");
 	}
 }

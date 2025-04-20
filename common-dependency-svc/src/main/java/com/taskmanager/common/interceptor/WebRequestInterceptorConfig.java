@@ -1,21 +1,18 @@
-package com.taskmanager.common.configuration;
+package com.taskmanager.common.interceptor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.taskmanager.common.interceptor.CustomRequestInterceptor;
-
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
+public class WebRequestInterceptorConfig implements WebMvcConfigurer {
 
 	@Autowired
 	private CustomRequestInterceptor customRequestInterceptor;
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(customRequestInterceptor).addPathPatterns("/api/**") // Apply to specific endpoints
-				.excludePathPatterns("/api/auth/**"); // Exclude specific endpoints
+		registry.addInterceptor(customRequestInterceptor).addPathPatterns("/api/**");
 	}
 }

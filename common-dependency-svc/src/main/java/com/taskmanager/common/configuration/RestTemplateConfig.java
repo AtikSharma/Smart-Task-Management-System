@@ -3,6 +3,7 @@ package com.taskmanager.common.configuration;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -17,6 +18,7 @@ public class RestTemplateConfig {
 	private RestTemplateInterceptor restTemplateInterceptor;
 
 	@Bean
+	@LoadBalanced
 	RestTemplate restTemplate() {
 		RestTemplate restTemplate = new RestTemplate();
 		List<ClientHttpRequestInterceptor> interceptors = restTemplate.getInterceptors();

@@ -2,24 +2,20 @@ package com.taskmanager.common.model;
 
 import com.taskmanager.common.enums.Role;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@Setter
-@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
-public class UserBase {
-
-	private String id;
+@AllArgsConstructor
+@SuperBuilder(toBuilder = true)
+public class UserExp {
 
 	private String username;
 
 	private String email;
-
-	private String password;
 
 	private Role role;
 }

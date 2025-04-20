@@ -2,6 +2,7 @@ package com.taskmanager.common.interceptor;
 
 import java.io.IOException;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -21,11 +22,17 @@ public class RestTemplateInterceptor implements ClientHttpRequestInterceptor {
 	@Override
 	public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
 			throws IOException {
-		logger.debug("Intercepting Http Call : " + request.getURI().toString());
+		logger.debug("Sending Http Call to : " + request.getURI().toString());
 		HttpHeaders requestHeaders = request.getHeaders();
 		requestHeaders.set(RequestContext.HEADER_FIELD_CORRELATION_ID, RequestContext.getCorrelationId());
 		requestHeaders.set(RequestContext.HEADER_FIELD_AUTHORIZATION, RequestContext.getAuthorizationToken());
-		return execution.execute(request, body);
+		try {
+			return execution.execute(request, body);
+		} catch (Exception e) {
+			logger.error("Error occured while calling : " + request.getURI().toString() + " : "
+					+ ExceptionUtils.getRootCauseMessage(e));
+			throw e;
+		}
 	}
 
 }

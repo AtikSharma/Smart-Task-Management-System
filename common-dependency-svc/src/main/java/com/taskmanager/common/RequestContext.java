@@ -1,5 +1,8 @@
 package com.taskmanager.common;
 
+import com.taskmanager.common.util.StringUtils;
+
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -27,5 +30,27 @@ public class RequestContext {
 
 	public static String getAuthorizationToken() {
 		return AUTHORIZATION_TOKEN_HOLDER.get();
+	}
+
+	public static void resolveCorrelationId(HttpServletRequest request) {
+		String correlationId = request.getHeader(HEADER_FIELD_CORRELATION_ID);
+		if (StringUtils.isBlank(correlationId)) {
+			correlationId = (String) request.getAttribute(HEADER_FIELD_CORRELATION_ID);
+			if (StringUtils.isBlank(correlationId)) {
+				setCorrelationId(StringUtils.EMPTY);
+			}
+		}
+		setCorrelationId(correlationId);
+	}
+
+	public static void resolveAuthorizationToken(HttpServletRequest request) {
+		String authorizationToken = request.getHeader(HEADER_FIELD_AUTHORIZATION);
+		if (StringUtils.isBlank(authorizationToken)) {
+			authorizationToken = (String) request.getAttribute(HEADER_FIELD_AUTHORIZATION);
+			if (StringUtils.isBlank(authorizationToken)) {
+				setAuthorizationToken(StringUtils.EMPTY);
+			}
+		}
+		setAuthorizationToken(authorizationToken);
 	}
 }
