@@ -1,0 +1,48 @@
+package com.taskmanager.usermanagement.service.impl;
+
+import java.time.LocalDateTime;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.taskmanager.common.enums.Status;
+import com.taskmanager.common.model.User;
+import com.taskmanager.usermanagement.dao.UserDao;
+import com.taskmanager.usermanagement.service.UserService;
+
+@Service
+public class UserServiceImpl implements UserService {
+
+	private UserDao userDao;
+
+	@Autowired
+	public UserServiceImpl(UserDao userDao) {
+		this.userDao = userDao;
+	}
+
+	@Override
+	public User getUserDetails(User user) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public User userRegistration(User user) {
+		LocalDateTime now = LocalDateTime.now();
+		user = user.toBuilder().status(Status.ACTIVE).createdAt(now).updatedAt(now).build();
+		return userDao.registerUser(user);
+	}
+
+	@Override
+	public User updateUser(User user) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public User deleteUser(User user) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}
