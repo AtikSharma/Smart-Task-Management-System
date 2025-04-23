@@ -9,14 +9,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.taskmanager.common.exception.RestCallException;
 import com.taskmanager.common.model.ErrorResponse;
-
-import jakarta.servlet.http.HttpServletRequest;
+import com.taskmanager.common.util.CommonUtility;
 
 @Aspect
 @Component
@@ -29,27 +25,23 @@ public class RestCallExceptionAspect {
 		} catch (HttpClientErrorException | HttpServerErrorException ex) {
 			RestCallException exception = new RestCallException(ex);
 			ErrorResponse response = ex.getResponseBodyAs(ErrorResponse.class);
+			if (response == null) {
+				response = new ErrorResponse().buildError(ExceptionUtils.getMessage(exception), "Something went wrong",
+						CommonUtility.getRequestUrl(), HttpStatus.valueOf(ex.getStatusCode().value()));
+			}
 			exception.setErrorResponse(response);
 			throw exception;
 		} catch (ResourceAccessException ex) {
 			RestCallException exception = new RestCallException(ex);
-			exception.setErrorResponse(new ErrorResponse().buildError("Unable to access the resource",
-					ExceptionUtils.getMessage(exception), getRequestUrl(), HttpStatus.SERVICE_UNAVAILABLE));
+			exception.setErrorResponse(new ErrorResponse().buildError(ExceptionUtils.getMessage(exception),
+					"Unable to access the resource", CommonUtility.getRequestUrl(), HttpStatus.SERVICE_UNAVAILABLE));
 			throw exception;
 		} catch (Exception ex) {
 			RestCallException exception = new RestCallException(ex);
 			exception.setErrorResponse(new ErrorResponse().buildError(ExceptionUtils.getMessage(exception),
-					ex.getMessage(), getRequestUrl(), HttpStatus.INTERNAL_SERVER_ERROR));
+					"Something went wrong", CommonUtility.getRequestUrl(), HttpStatus.INTERNAL_SERVER_ERROR));
 			throw exception;
 		}
 	}
 
-	private String getRequestUrl() {
-		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-		if (requestAttributes instanceof ServletRequestAttributes servletRequestAttributes) {
-			HttpServletRequest request = servletRequestAttributes.getRequest();
-			return request.getRequestURL().toString();
-		}
-		return "UNKNOWN_URL";
-	}
 }

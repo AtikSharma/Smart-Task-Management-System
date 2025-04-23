@@ -1,8 +1,9 @@
 package com.taskmanager.common.model;
 
-import java.time.LocalDateTime;
+import java.net.URI;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 
 import com.taskmanager.common.RequestContext;
@@ -14,30 +15,26 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ErrorResponse extends BaseResponse {
+public class ErrorResponse extends ProblemDetail {
 
-	private LocalDateTime timestamp;
-	private String error;
-	private String message;
-	private String path;
+	private static final long serialVersionUID = 1L;
+	private String correlationId;
 
-	public ResponseEntity<ErrorResponse> build(String error, String exceptionMessage, String url, HttpStatus status) {
+	public ResponseEntity<ErrorResponse> build(String detail, String title, String requestUrl, HttpStatus status) {
 		setStatus(status.value());
 		setCorrelationId(RequestContext.getCorrelationId());
-		setMessage(exceptionMessage);
-		setError(error);
-		setPath(url);
-		setTimestamp(LocalDateTime.now());
+		setTitle(title);
+		setDetail(detail);
+		setInstance(URI.create(requestUrl));
 		return new ResponseEntity<ErrorResponse>(this, status);
 	}
 
-	public ErrorResponse buildError(String error, String exceptionMessage, String url, HttpStatus status) {
+	public ErrorResponse buildError(String detail, String title, String requestUrl, HttpStatus status) {
 		setStatus(status.value());
 		setCorrelationId(RequestContext.getCorrelationId());
-		setMessage(exceptionMessage);
-		setError(error);
-		setPath(url);
-		setTimestamp(LocalDateTime.now());
+		setTitle(title);
+		setDetail(detail);
+		setInstance(URI.create(requestUrl));
 		return this;
 	}
 

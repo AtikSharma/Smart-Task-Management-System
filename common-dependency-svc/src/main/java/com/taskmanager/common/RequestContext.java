@@ -15,6 +15,7 @@ public class RequestContext {
 
 	private static final ThreadLocal<String> CORRELATION_ID_HOLDER = new ThreadLocal<>();
 	private static final ThreadLocal<String> AUTHORIZATION_TOKEN_HOLDER = new ThreadLocal<>();
+	private static final ThreadLocal<String> REQUESTED_URL = new ThreadLocal<>();
 
 	public static void setCorrelationId(String string) {
 		CORRELATION_ID_HOLDER.set(string);
@@ -30,6 +31,16 @@ public class RequestContext {
 
 	public static String getAuthorizationToken() {
 		return AUTHORIZATION_TOKEN_HOLDER.get();
+	}
+
+	public static String getRequestedUrl() {
+		String url = REQUESTED_URL.get();
+		REQUESTED_URL.remove();
+		return url;
+	}
+
+	public static void setRequestedURL(String url) {
+		REQUESTED_URL.set(url);
 	}
 
 	public static void resolveCorrelationId(HttpServletRequest request) {

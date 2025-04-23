@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.taskmanager.common.annotation.RestCallExceptionHandler;
+import com.taskmanager.common.constants.CommonConstants;
 import com.taskmanager.common.model.UserBase;
 import com.taskmanager.common.model.request.RegistrationRequest;
 import com.taskmanager.common.util.URLBuilder;
@@ -17,7 +18,7 @@ import com.taskmanager.common.util.URLBuilder;
 @Component
 public class UserServiceClientImpl implements UserServiceClient {
 
-	@Value(value = "${taskmanager.userservice.instance.name:user-svc}")
+	@Value(value = "${taskmanager.userservice.instance.name:" + CommonConstants.USER_SVC + "}")
 	private String serviceName;
 
 	private RestTemplate restTemplate;

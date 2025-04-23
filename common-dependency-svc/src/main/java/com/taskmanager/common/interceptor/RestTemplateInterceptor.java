@@ -22,7 +22,8 @@ public class RestTemplateInterceptor implements ClientHttpRequestInterceptor {
 	@Override
 	public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
 			throws IOException {
-		logger.debug("Sending Http Call to : " + request.getURI().toString());
+		logger.debug(request.getMethod() + " API Call to : " + request.getURI().toString());
+		RequestContext.setRequestedURL(request.getURI().getPath());
 		HttpHeaders requestHeaders = request.getHeaders();
 		requestHeaders.set(RequestContext.HEADER_FIELD_CORRELATION_ID, RequestContext.getCorrelationId());
 		requestHeaders.set(RequestContext.HEADER_FIELD_AUTHORIZATION, RequestContext.getAuthorizationToken());
