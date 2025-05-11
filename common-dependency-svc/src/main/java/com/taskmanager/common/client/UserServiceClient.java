@@ -7,4 +7,6 @@ public interface UserServiceClient {
 
 	public UserBase registerUser(RegistrationRequest registrationRequest);
 
+	public UserBase getUserDetails(String identifier);
+
 }

@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.taskmanager.common.RequestContext;
 
 import lombok.Getter;
@@ -15,6 +16,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonPropertyOrder({"status", "correlationId", "title", "detail", "instance", "type"})
 public class ErrorResponse extends ProblemDetail {
 
 	private static final long serialVersionUID = 1L;
@@ -25,7 +27,7 @@ public class ErrorResponse extends ProblemDetail {
 		setCorrelationId(RequestContext.getCorrelationId());
 		setTitle(title);
 		setDetail(detail);
-		setInstance(URI.create(requestUrl));
+		setInstance(requestUrl != null ? URI.create(requestUrl) : null);
 		return new ResponseEntity<ErrorResponse>(this, status);
 	}
 
@@ -34,7 +36,7 @@ public class ErrorResponse extends ProblemDetail {
 		setCorrelationId(RequestContext.getCorrelationId());
 		setTitle(title);
 		setDetail(detail);
-		setInstance(URI.create(requestUrl));
+		setInstance(requestUrl != null ? URI.create(requestUrl) : null);
 		return this;
 	}
 

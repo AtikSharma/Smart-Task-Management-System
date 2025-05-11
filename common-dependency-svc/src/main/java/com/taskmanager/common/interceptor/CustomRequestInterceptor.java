@@ -26,9 +26,10 @@ public class CustomRequestInterceptor implements HandlerInterceptor {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 		preHandleTimeStamp = LocalDateTime.now();
-		logger.debug("Request URI: " + request.getRequestURI() + " at : " + preHandleTimeStamp);
 		RequestContext.resolveCorrelationId(request);
 		RequestContext.resolveAuthorizationToken(request);
+		logger.debug(
+				"Request URI: " + request.getRequestURI() + " with correlationId " + RequestContext.getCorrelationId());
 		return true;
 	}
 

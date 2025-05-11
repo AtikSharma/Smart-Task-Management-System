@@ -49,14 +49,14 @@ public class URLBuilder {
 			if (!url.toString().endsWith("/")) {
 				url.append("/");
 			}
-			url.append(encode(segment));
+			url.append(segment);
 		}
 
 		// Append query parameters
 		if (!queryParams.isEmpty()) {
 			url.append("?");
 			queryParams.forEach((key, value) -> {
-				url.append(encode(key)).append("=").append(encode(value)).append("&");
+				url.append(key).append("=").append(value).append("&");
 			});
 			url.deleteCharAt(url.length() - 1); // Remove trailing &
 		}

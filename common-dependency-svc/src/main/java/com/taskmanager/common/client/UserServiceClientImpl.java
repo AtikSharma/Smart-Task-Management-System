@@ -2,6 +2,8 @@ package com.taskmanager.common.client;
 
 import java.net.URI;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -18,6 +20,8 @@ import com.taskmanager.common.util.URLBuilder;
 @Component
 public class UserServiceClientImpl implements UserServiceClient {
 
+	Logger logger = LoggerFactory.getLogger(getClass());
+
 	@Value(value = "${taskmanager.userservice.instance.name:" + CommonConstants.USER_SVC + "}")
 	private String serviceName;
 
@@ -31,10 +35,19 @@ public class UserServiceClientImpl implements UserServiceClient {
 	@Override
 	@RestCallExceptionHandler
 	public UserBase registerUser(RegistrationRequest registrationRequest) {
-		String url = URLBuilder.builder().protocol("http").serviceName(serviceName).addPathSegment("api")
-				.addPathSegment("users").addPathSegment("register").build();
+		String url = URLBuilder.builder().protocol("http").serviceName(serviceName)
+				.addPathSegment(CommonConstants.BASE_URL_USER).addPathSegment(CommonConstants.REGISTER).build();
 		HttpEntity<RegistrationRequest> requestEntity = new HttpEntity<>(registrationRequest);
 		return restTemplate.exchange(URI.create(url), HttpMethod.POST, requestEntity, UserBase.class).getBody();
+	}
+
+	@Override
+	public UserBase getUserDetails(String identifier) {
+		String url = URLBuilder.builder().protocol("http").serviceName(serviceName)
+				.addPathSegment(CommonConstants.BASE_URL_USER).addPathSegment(CommonConstants.USER)
+				.addPathSegment(identifier).build();
+		logger.info(URI.create(url).toString());
+		return restTemplate.exchange(URI.create(url), HttpMethod.GET, HttpEntity.EMPTY, UserBase.class).getBody();
 	}
 
 }

@@ -9,11 +9,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.taskmanager.common.exception.ApplicationException;
 import com.taskmanager.common.exception.RestCallException;
 import com.taskmanager.common.model.ErrorResponse;
 import com.taskmanager.common.util.CommonUtility;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -31,9 +30,17 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-	public @ResponseBody ResponseEntity<ErrorResponse> handleMethodNotSupportedException(Exception exception) {
+	public @ResponseBody ResponseEntity<ErrorResponse> handleMethodNotSupportedException(
+			HttpRequestMethodNotSupportedException exception) {
 		return new ErrorResponse().build(exception.getMessage(), "Method Not Allowed", CommonUtility.getRequestUrl(),
 				HttpStatus.METHOD_NOT_ALLOWED);
+	}
+
+	@ExceptionHandler(ApplicationException.class)
+	public @ResponseBody ResponseEntity<ErrorResponse> handleApplicationException(ApplicationException exception) {
+		return new ErrorResponse().build(exception.getLocalizedMessage() + exception.getParamsAsString(),
+				exception.getLocalizedMessage(), CommonUtility.getRequestUrl(),
+				exception.getStatus() != null ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@ExceptionHandler(Exception.class)
