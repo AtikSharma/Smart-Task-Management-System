@@ -21,6 +21,10 @@ public class StringUtils {
 		return string != null && string.isBlank();
 	}
 
+	public static boolean isNotNullAndNotBlank(String string) {
+		return string != null && !string.isBlank();
+	}
+
 	public static Predicate<String> isValidEmail = (email) -> {
 		return !isBlank(email) && EMAIL_PATTERN.matcher(email).matches();
 	};

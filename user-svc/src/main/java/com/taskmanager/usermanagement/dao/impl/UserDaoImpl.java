@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+import com.taskmanager.common.enums.Status;
 import com.taskmanager.common.model.User;
 import com.taskmanager.usermanagement.dao.UserDao;
 import com.taskmanager.usermanagement.entity.UserEntity;

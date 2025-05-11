@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.taskmanager.common.RequestContext;
 import com.taskmanager.common.constants.CommonConstants;
+import com.taskmanager.common.enums.Role;
 import com.taskmanager.common.model.ServiceResponse;
 import com.taskmanager.common.model.User;
 import com.taskmanager.common.model.UserBase;
@@ -50,7 +51,9 @@ public class UserController {
 	@PostMapping(path = CommonConstants.REGISTER)
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "201", description = "User Registration API", content = @Content(schema = @Schema(implementation = ServiceResponse.class), mediaType = MediaType.APPLICATION_JSON_VALUE)) })
-	public ResponseEntity<UserBase> registration(@RequestBody RegistrationRequest registrationRequest) {
+	public ResponseEntity<UserBase> registration(@RequestBody RegistrationRequest registrationRequest,
+			@RequestHeader(name = RequestContext.HEADER_FIELD_AUTHORIZATION, required = true) String authorizationHeader) {
+		jwtUtils.validateAccess(authorizationHeader, Role.getRoleList(Role.SYSTEM));
 		User user = userBOMapper.mapFromRegistrationRequest(registrationRequest);
 		user = userService.userRegistration(user);
 		UserBase userBase = userBOMapper.mapFrom(user);
@@ -60,18 +63,18 @@ public class UserController {
 	@GetMapping(path = CommonConstants.USERS_API_USER + "{identifier}")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "User Details", content = @Content(schema = @Schema(implementation = ServiceResponse.class), mediaType = MediaType.APPLICATION_JSON_VALUE)) })
-	public ResponseEntity<UserBase> getUserDetailsByIdentifier(@PathVariable String identifier) {
-		User user = userService.getUserDetails(identifier);
-		UserBase userBase = userBOMapper.mapFrom(user);
-		return new ServiceResponse().build("User Details", HttpStatus.OK, userBase);
+	public ResponseEntity<User> getUserDetailsByIdentifier(@PathVariable String identifier,
+			@RequestHeader(name = RequestContext.HEADER_FIELD_AUTHORIZATION, required = true) String authorizationHeader) {
+		jwtUtils.validateAccess(authorizationHeader, Role.getRoleList(Role.values()));
+		return new ServiceResponse().build("User Details", HttpStatus.OK, userService.getUserDetails(identifier));
 	}
 
 	@GetMapping
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "User Details", content = @Content(schema = @Schema(implementation = UsersDetailResponse.class), mediaType = MediaType.APPLICATION_JSON_VALUE)) })
 	public ResponseEntity<UsersDetailResponse> getAllUsers(
-			@RequestHeader(name = RequestContext.HEADER_FIELD_AUTHORIZATION, defaultValue = CommonConstants.DEFAULT_AUTHORIZATION, required = true) String token) {
-		jwtUtils.validateToken(token);
+			@RequestHeader(name = RequestContext.HEADER_FIELD_AUTHORIZATION, required = true) String authorizationHeader) {
+		jwtUtils.validateAccess(authorizationHeader, Role.getRoleList(Role.ADMIN, Role.MANAGER));
 		List<User> users = userService.getAllUsers();
 		UsersDetailResponse response = new UsersDetailResponse(userBOMapper.mapToUserBase(users));
 		return response.build("Loaded all the Users", HttpStatus.OK, response);

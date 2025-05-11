@@ -12,9 +12,11 @@ import com.taskmanager.auth.model.RefreshToken;
 import com.taskmanager.auth.service.AuthService;
 import com.taskmanager.common.client.UserServiceClient;
 import com.taskmanager.common.constants.ErrorConstants;
+import com.taskmanager.common.enums.Status;
 import com.taskmanager.common.exception.ApplicationException;
 import com.taskmanager.common.exception.RestCallException;
 import com.taskmanager.common.model.JwtToken;
+import com.taskmanager.common.model.User;
 import com.taskmanager.common.model.UserBase;
 import com.taskmanager.common.model.request.RegistrationRequest;
 import com.taskmanager.common.util.JwtUtils;
@@ -28,7 +30,7 @@ public class AuthServiceImpl implements AuthService {
 	private UserBOMapper userBOMapper;
 	private JwtUtils jwtUtils;
 	private TokenDao tokenDao;
-	
+
 	Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
@@ -51,7 +53,11 @@ public class AuthServiceImpl implements AuthService {
 
 		// TODO : Fetch UserDetail
 		String identifier = getIdentifier(userBase);
-		UserBase userDetails = getUserDetails(identifier);
+		User userDetails = getUserDetails(identifier);
+
+		if (!userDetails.getStatus().equals(Status.ACTIVE)) {
+			throw new ApplicationException(ErrorConstants.INACTIVE_USER, HttpStatus.UNAUTHORIZED);
+		}
 
 		// TODO : Validate Password, if invalid raise exception
 		if (PasswordUtil.isMatch(userBase.getPassword(), userDetails.getPassword())) {
@@ -66,11 +72,11 @@ public class AuthServiceImpl implements AuthService {
 
 			return jwtToken;
 		} else {
-			throw new ApplicationException("Password is Incorrect", HttpStatus.UNAUTHORIZED);
+			throw new ApplicationException(ErrorConstants.INCORRECT_PASSWORD, HttpStatus.UNAUTHORIZED);
 		}
 	}
 
-	private UserBase getUserDetails(String identifier) {
+	private User getUserDetails(String identifier) {
 		try {
 			return userServiceClient.getUserDetails(identifier);
 		} catch (RestCallException e) {
@@ -78,8 +84,8 @@ public class AuthServiceImpl implements AuthService {
 				throw new ApplicationException(ErrorConstants.ERROR_INVALID_USERNAME_OR_PASSWORD);
 			}
 		} catch (Exception e) {
-			logger.error(ErrorConstants.ERROR_WHILE_FINDING_USER,e);
-			throw new ApplicationException(ErrorConstants.ERROR_WHILE_FINDING_USER,e);
+			logger.error(ErrorConstants.ERROR_WHILE_FINDING_USER, e);
+			throw new ApplicationException(ErrorConstants.ERROR_WHILE_FINDING_USER, e);
 		}
 		return null;
 	}

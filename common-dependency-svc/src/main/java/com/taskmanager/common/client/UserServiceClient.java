@@ -1,5 +1,6 @@
 package com.taskmanager.common.client;
 
+import com.taskmanager.common.model.User;
 import com.taskmanager.common.model.UserBase;
 import com.taskmanager.common.model.request.RegistrationRequest;
 
@@ -7,6 +8,6 @@ public interface UserServiceClient {
 
 	public UserBase registerUser(RegistrationRequest registrationRequest);
 
-	public UserBase getUserDetails(String identifier);
+	public User getUserDetails(String identifier);
 
 }

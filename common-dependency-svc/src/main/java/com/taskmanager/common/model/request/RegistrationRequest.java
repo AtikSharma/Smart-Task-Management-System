@@ -3,6 +3,7 @@ package com.taskmanager.common.model.request;
 import java.io.Serializable;
 
 import com.taskmanager.common.enums.Role;
+import com.taskmanager.common.enums.Status;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

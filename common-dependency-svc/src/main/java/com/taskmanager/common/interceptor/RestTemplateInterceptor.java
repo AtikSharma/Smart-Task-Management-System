@@ -1,6 +1,7 @@
 package com.taskmanager.common.interceptor;
 
 import java.io.IOException;
+import java.net.URI;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -22,13 +23,23 @@ public class RestTemplateInterceptor implements ClientHttpRequestInterceptor {
 	@Override
 	public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
 			throws IOException {
-		logger.debug(request.getMethod() + " API Call to : " + request.getURI().toString());
-		RequestContext.setRequestedURL(request.getURI().getPath());
+
+		ClientHttpResponse response;
+
+		URI requestedURI = request.getURI();
+		String correlationId = RequestContext.getCorrelationId();
+
 		HttpHeaders requestHeaders = request.getHeaders();
-		requestHeaders.set(RequestContext.HEADER_FIELD_CORRELATION_ID, RequestContext.getCorrelationId());
+		requestHeaders.set(RequestContext.HEADER_FIELD_CORRELATION_ID, correlationId);
 		requestHeaders.set(RequestContext.HEADER_FIELD_AUTHORIZATION, RequestContext.getAuthorizationToken());
+
+		RequestContext.setRequestedURL(requestedURI.getPath());
+
+		logger.debug("{" + correlationId + "} : " + request.getMethod() + " : " + requestedURI.toString());
 		try {
-			return execution.execute(request, body);
+			response = execution.execute(request, body);
+			logger.debug("{" + correlationId + "} : " + request.getMethod() + " : " + response.getStatusCode());
+			return response;
 		} catch (Exception e) {
 			logger.error("Error occured while calling : " + request.getURI().toString() + " : "
 					+ ExceptionUtils.getRootCauseMessage(e));

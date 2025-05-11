@@ -47,14 +47,9 @@ public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> 
 				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
 			}
 
-			String accessToken = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
+			String authorizationHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
 
-			String[] parts = accessToken.split(CommonConstants.SPACE);
-			if (parts.length != 2 || !CommonConstants.BEARER.equals(parts[0])) {
-				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-			}
-
-			jwtUtils.validateToken(accessToken);
+			jwtUtils.validateAuthorizationHeader(authorizationHeader);
 
 			return chain.filter(exchange.mutate().build()).then(Mono.fromRunnable(() -> {
 			}));

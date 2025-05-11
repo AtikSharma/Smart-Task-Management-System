@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.taskmanager.common.enums.Status;
 import com.taskmanager.common.util.StringUtils;
 import com.taskmanager.usermanagement.entity.UserEntity;
 
@@ -23,5 +24,12 @@ public class UserSpecification {
 			}
 			return predicate;
 		};
+	}
+
+	public static Specification<UserEntity> matchIdentifier(String identifier, Status status) {
+		return matchIdentifier(identifier).and((root, query, cb) -> {
+			Predicate predicate = cb.equal(root.get("status"), Status.ACTIVE);
+			return predicate;
+		});
 	}
 }

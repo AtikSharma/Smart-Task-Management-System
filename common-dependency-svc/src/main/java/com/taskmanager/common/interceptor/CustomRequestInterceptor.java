@@ -28,8 +28,8 @@ public class CustomRequestInterceptor implements HandlerInterceptor {
 		preHandleTimeStamp = LocalDateTime.now();
 		RequestContext.resolveCorrelationId(request);
 		RequestContext.resolveAuthorizationToken(request);
-		logger.debug(
-				"Request URI: " + request.getRequestURI() + " with correlationId " + RequestContext.getCorrelationId());
+		logger.debug("{" + RequestContext.getCorrelationId() + "} : " + request.getMethod() + " : "
+				+ request.getRequestURI());
 		return true;
 	}
 

@@ -1,5 +1,7 @@
 package com.taskmanager.common;
 
+import com.taskmanager.common.constants.CommonConstants;
+import com.taskmanager.common.constants.JwtConstants;
 import com.taskmanager.common.util.StringUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +28,9 @@ public class RequestContext {
 	}
 
 	public static void setAuthorizationToken(String string) {
+		if (StringUtils.isNotNullAndNotBlank(string) && !string.contains(CommonConstants.BEARER)) {
+			string = CommonConstants.BEARER + CommonConstants.SPACE + string;
+		}
 		AUTHORIZATION_TOKEN_HOLDER.set(string);
 	}
 

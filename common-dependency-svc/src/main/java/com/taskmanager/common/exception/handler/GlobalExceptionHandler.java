@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.taskmanager.common.exception.ApplicationException;
+import com.taskmanager.common.exception.CustomSecurityException;
 import com.taskmanager.common.exception.RestCallException;
 import com.taskmanager.common.model.ErrorResponse;
 import com.taskmanager.common.util.CommonUtility;
@@ -25,7 +26,7 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	public @ResponseBody ResponseEntity<ErrorResponse> handleException(DataIntegrityViolationException exception) {
-		return new ErrorResponse().build(exception.getMostSpecificCause().toString(), "Data Error",
+		return new ErrorResponse().build(ExceptionUtils.getRootCauseMessage(exception), "Data Error",
 				CommonUtility.getRequestUrl(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
@@ -38,9 +39,16 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(ApplicationException.class)
 	public @ResponseBody ResponseEntity<ErrorResponse> handleApplicationException(ApplicationException exception) {
-		return new ErrorResponse().build(exception.getLocalizedMessage() + exception.getParamsAsString(),
-				exception.getLocalizedMessage(), CommonUtility.getRequestUrl(),
+		return new ErrorResponse().build(ExceptionUtils.getRootCauseMessage(exception),
+				exception.getLocalizedMessage() + exception.getParamsAsString(), CommonUtility.getRequestUrl(),
 				exception.getStatus() != null ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	@ExceptionHandler(CustomSecurityException.class)
+	public @ResponseBody ResponseEntity<ErrorResponse> handleCustomSecurityException(
+			CustomSecurityException exception) {
+		return new ErrorResponse().build(exception.getMessage(), exception.getStatus().getReasonPhrase(),
+				CommonUtility.getRequestUrl(), exception.getStatus());
 	}
 
 	@ExceptionHandler(Exception.class)
